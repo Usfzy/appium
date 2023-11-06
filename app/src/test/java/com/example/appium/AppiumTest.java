@@ -1,10 +1,17 @@
 package com.example.appium;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.appium.java_client.AppiumDriver;
@@ -28,18 +35,43 @@ public class AppiumTest {
         // Wait for the app to launch
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
-        // Enter the first name and last name
-        driver.findElement(By.id("inputFirstName")).sendKeys("John");
-        driver.findElement(By.id("inputLastName")).sendKeys("Doe");
+        WebElement fromLocationSpinner = driver.findElement(By.id("spFromLocation"));
+        fromLocationSpinner.click();
 
-        // Click the button to display the data
-        driver.findElement(By.id("btSubmit")).click();
+        WebElement firstLocationItem = driver.findElements(By.className("android.widget.TextView")).get(1);
+        firstLocationItem.click();
 
-        // Wait for the data to be displayed
+        WebElement toLocationSpinner = driver.findElement(By.id("spToLocation"));
+        toLocationSpinner.click();
+
+        WebElement secondLocationItem = driver.findElements(By.className("android.widget.TextView")).get(2);
+        secondLocationItem.click();
+
+        WebElement fromDate = driver.findElement(By.id("inputFromDate"));
+        fromDate.sendKeys("(01/01/2022)");
+
+        WebElement toDate = driver.findElement(By.id("inputToDate"));
+        toDate.sendKeys("(01/02/2022)");
+
+        WebElement firstNameField = driver.findElement(By.id("inputFirstName"));
+        firstNameField.sendKeys("John");
+
+        WebElement lastNameField = driver.findElement(By.id("inputLastName"));
+        lastNameField.sendKeys("Doe");
+
+        WebElement submitButton = driver.findElement(By.id("btSubmit"));
+        submitButton.click();
+
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
-        // Assert that the first name and last name are displayed
-        String fullName = driver.findElement(By.id("tvFullName")).getText();
-        Assert.assertEquals(fullName, "John Doe");
+        // Verify that the form was submitted successfully
+        WebElement toastMessage = driver.findElement(By.xpath("//android.widget.Toast[1]"));
+        assertEquals("Data submitted successfully", toastMessage.getText());
+
+    }
+
+    public void waitForElementToBeInteractive(AppiumDriver driver, By by, Duration timeout) {
+        WebDriverWait wait = new WebDriverWait(driver, timeout);
+        wait.until(ExpectedConditions.elementToBeClickable(by));
     }
 }
